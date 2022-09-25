@@ -5,7 +5,7 @@ from api_basic.models import Article
 from api_basic.serializers import ArticleSerializer
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
-
+from rest_framework import status
 # Create your views here.
 
 @csrf_exempt
@@ -15,13 +15,12 @@ def article_list(request):
         serializers = ArticleSerializer(article, many = True)
         return JsonResponse(serializers.data, safe=False)
     elif request.method == 'POST':
-        data = JSONParser().parse(request)
-        serializer = ArticleSerializer(data=data)
+        serializer = ArticleSerializer(data = request.data)
 
         if serializer.is_valid():
             serializer.save()
-            return JsonResponse(serializer.data, status=201)
-        return JsonResponse(serializer.errors, status=400)
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
 
 @csrf_exempt
 def article_detail(request, pk):
